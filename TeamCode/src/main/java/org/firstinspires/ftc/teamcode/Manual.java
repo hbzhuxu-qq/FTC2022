@@ -117,10 +117,10 @@ public class Manual extends LinearOpMode {
                 robot.carousel.goStill();
             }
             if(gamepad1.left_trigger>0){
-                robot.intake.intake();
+                robot.intake.intakeManual();
             }
             if(gamepad1.right_trigger>0){
-                robot.intake.out();
+                robot.intake.outManual();
             }
 
             // Show the elapsed game time and wheel power.

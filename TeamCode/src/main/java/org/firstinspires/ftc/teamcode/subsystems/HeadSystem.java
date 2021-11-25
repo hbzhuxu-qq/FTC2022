@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.RobotConfig;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 
 public class HeadSystem extends DeviceBase {
@@ -27,9 +29,15 @@ public class HeadSystem extends DeviceBase {
     double[] posLevel1 = {TICK_PER_DEGREE*60, 0.0};
     double[] posLevel2 = {TICK_PER_DEGREE*90, 0.0};
     double[] posLevel3 = {TICK_PER_DEGREE*110, 0.0};
-    int currPos = -1; //-1:init  0:intake  1:level1 2:level2 3:level3
+    public static final int LEVEL_INIT = 0;
+    public static final int LEVEL_INTAKE = 1;
+    public static final int LEVEL_1 = 2;
+    public static final int LEVEL_2 = 3;
+    public static final int LEVEL_3 = 4;
 
+    List<double[] > allPos = Arrays.asList(posInit,posIntake,posLevel1,posLevel2,posLevel3);
 
+    int currPos = 0; //-1:init  0:intake  1:level1 2:level2 3:level3
 
     public int targetPos = -1;
 
@@ -43,6 +51,7 @@ public class HeadSystem extends DeviceBase {
         neck = hardwareMap.get(DcMotorEx.class, RobotConfig.HEAD_MOTOR);
         neck.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         neck.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        neck.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         mouth = hardwareMap.get(Servo.class, RobotConfig.HEAD_SERVO_MOUSE);
 
@@ -53,51 +62,31 @@ public class HeadSystem extends DeviceBase {
 
 
     public void actionInit(){
-        currPos = -1;
-        action(posInit);
+        actionTo(LEVEL_INIT);
     }
 
     public void actionLevel1(){
-        currPos = 1;
-        action(posLevel1);
+        actionTo(LEVEL_1);
     }
 
     public void actionLevel2(){
-        currPos = 2;
-        action(posLevel2);
+        actionTo(LEVEL_2);
     }
 
     public void actionLevel3(){
-        currPos = 3;
-        action(posLevel3);
+        actionTo(LEVEL_3);
     }
 
     public void actionIntake(){
-        currPos = 0;
-        action(posIntake);
+
+        actionTo(LEVEL_INTAKE);
     }
 
     public void actionTo(int level){
-        if(level<-1) level = -1;
-        if(level>3)  level = 3;
-        switch(level) {
-            case -1:
-                actionInit();
-                break;
-            case 0:
-                actionIntake();
-                break;
-            case 1:
-                actionLevel1();
-                break;
-            case 2:
-                actionLevel2();
-                break;
-            case 3:
-                actionLevel3();
-                break;
-        }
-
+        if(level<0) level = 0;
+        if(level>allPos.size()-1)  level = allPos.size()-1;
+        action(posInit);
+        currPos = level;
     }
 
     public void action(double[] pos){
@@ -125,11 +114,13 @@ public class HeadSystem extends DeviceBase {
 
     // 手动抬头
     public void upManual(){
+        neck.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         neck.setVelocity(NECK_SPEED_MANUAL, AngleUnit.DEGREES);
     }
 
     // 手动降低
     public void downManual(){
+        neck.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         neck.setVelocity(NECK_SPEED_MANUAL, AngleUnit.DEGREES);
     }
 
@@ -145,7 +136,7 @@ public class HeadSystem extends DeviceBase {
     }
     @Override
     public void stop() {
-
+        neck.setVelocity(0);
     }
 
 

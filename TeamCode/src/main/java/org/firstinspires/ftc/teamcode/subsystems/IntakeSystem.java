@@ -12,9 +12,11 @@ import java.util.TimerTask;
 public class IntakeSystem extends DeviceBase {
 
     public DcMotorEx collector = null;
-
+    public static final double SPEED_ROUND = 2;
+    public static final double SPEED_DEGREE = SPEED_ROUND*360;
     Timer timer = new Timer();
     boolean isRunning = true;
+
 
     @Override
     public void init(HardwareMap hardwareMap) {
@@ -30,29 +32,45 @@ public class IntakeSystem extends DeviceBase {
 
     }
 
-    public void intake() {
+    /**
+     * 控制电机旋转速度
+     *
+     * */
+    public void intakeManual() {
         if(isRunning){
             stop();
         }else {
-            intake(2 * 360);
+            intake(SPEED_DEGREE);
         }
         isRunning = !isRunning;
 
     }
 
-    public void out() {
+    /**
+     * 控制电机旋转速度
+     *
+     * */
+    public void outManual() {
         if(isRunning){
             stop();
         }else {
-            intake(-2*360);
+            intake(-SPEED_DEGREE);
         }
         isRunning = !isRunning;
     }
 
+    /**
+     * 控制电机旋转速度
+     *
+     * */
     public void intake(double speed) {
         collector.setVelocity(speed, AngleUnit.DEGREES);
     }
 
+    /**
+     * 启动，定时自动停止
+     *
+     * */
     public void intake(double speed, double timeInSecs) {
         intake(speed);
         timer.schedule(new TaskStop(), (long) (timeInSecs*1000));
@@ -80,10 +98,10 @@ public class IntakeSystem extends DeviceBase {
         super.autoLoop(time);
         switch(tasks.getName()){
             case TASK_INTAKE_IN:
-                intake(2.0 * 360);
+                intake(SPEED_DEGREE);
                 break;
             case TASK_INTAKE_OUT:
-                spit(-2.0 * 360);
+                spit(-SPEED_DEGREE);
                 break;
             case TASK_STOP_WAIT:
                 stop();

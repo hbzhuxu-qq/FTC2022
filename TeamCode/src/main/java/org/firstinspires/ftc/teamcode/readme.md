@@ -1,121 +1,132 @@
-## TeamCode Module
+## FTC2022 RobotController
 
-Welcome!
-
-This module, TeamCode, is the place where you will write/paste the code for your team's
-robot controller App. This module is currently empty (a clean slate) but the
-process for adding OpModes is straightforward.
-
-## Creating your own OpModes
-
-The easiest way to create your own OpMode is to copy a Sample OpMode and make it your own.
-
-Sample opmodes exist in the FtcRobotController module.
-To locate these samples, find the FtcRobotController module in the "Project/Android" tab.
-
-Expand the following tree elements:
- FtcRobotController / java / org.firstinspires.ftc.robotcontroller / external / samples
-
-A range of different samples classes can be seen in this folder.
-The class names follow a naming convention which indicates the purpose of each class.
-The full description of this convention is found in the samples/sample_convention.md file.
-
-A brief synopsis of the naming convention is given here:
-The prefix of the name will be one of the following:
-
-* Basic:    This is a minimally functional OpMode used to illustrate the skeleton/structure
-            of a particular style of OpMode.  These are bare bones examples.
-* Sensor:   This is a Sample OpMode that shows how to use a specific sensor.
-            It is not intended as a functioning robot, it is simply showing the minimal code
-            required to read and display the sensor values.
-* Hardware: This is not an actual OpMode, but a helper class that is used to describe
-            one particular robot's hardware devices: eg: for a Pushbot.  Look at any
-            Pushbot sample to see how this can be used in an OpMode.
-            Teams can copy one of these to create their own robot definition.
-* Pushbot:  This is a Sample OpMode that uses the Pushbot robot structure as a base.
-* Concept:	This is a sample OpMode that illustrates performing a specific function or concept.
-            These may be complex, but their operation should be explained clearly in the comments,
-            or the header should reference an external doc, guide or tutorial.
-* Library:  This is a class, or set of classes used to implement some strategy.
-            These will typically NOT implement a full OpMode.  Instead they will be included
-            by an OpMode to provide some stand-alone capability.
-
-Once you are familiar with the range of samples available, you can choose one to be the
-basis for your own robot.  In all cases, the desired sample(s) needs to be copied into
-your TeamCode module to be used.
-
-This is done inside Android Studio directly, using the following steps:
-
- 1) Locate the desired sample class in the Project/Android tree.
-
- 2) Right click on the sample class and select "Copy"
-
- 3) Expand the  TeamCode / java folder
-
- 4) Right click on the org.firstinspires.ftc.teamcode folder and select "Paste"
-
- 5) You will be prompted for a class name for the copy.
-    Choose something meaningful based on the purpose of this class.
-    Start with a capital letter, and remember that there may be more similar classes later.
-
-Once your copy has been created, you should prepare it for use on your robot.
-This is done by adjusting the OpMode's name, and enabling it to be displayed on the
-Driver Station's OpMode list.
-
-Each OpMode sample class begins with several lines of code like the ones shown below:
-
-```
- @TeleOp(name="Template: Linear OpMode", group="Linear Opmode")
- @Disabled
-```
-
-The name that will appear on the driver station's "opmode list" is defined by the code:
- ``name="Template: Linear OpMode"``
-You can change what appears between the quotes to better describe your opmode.
-The "group=" portion of the code can be used to help organize your list of OpModes.
-
-As shown, the current OpMode will NOT appear on the driver station's OpMode list because of the
-  ``@Disabled`` annotation which has been included.
-This line can simply be deleted , or commented out, to make the OpMode visible.
+本程序应用于2022年第一版硬件
+内容包括底盘、intake、运货、转盘、机械臂等结构的控制
 
 
+## RobotConfig
 
-## ADVANCED Multi-Team App management:  Cloning the TeamCode Module
+配置机器人各项硬件名称：RobotConfig.java
 
-In some situations, you have multiple teams in your club and you want them to all share
-a common code organization, with each being able to *see* the others code but each having
-their own team module with their own code that they maintain themselves.
 
-In this situation, you might wish to clone the TeamCode module, once for each of these teams.
-Each of the clones would then appear along side each other in the Android Studio module list,
-together with the FtcRobotController module (and the original TeamCode module).
+## 模块组成
+## 底盘
+底盘控制程序
 
-Selective Team phones can then be programmed by selecting the desired Module from the pulldown list
-prior to clicking to the green Run arrow.
+集成了RoadRunner相关功能控制。
+teamcode/subsystems/MecanumDriveWrapper.java
+. 对底盘的实际控制由内部的SampleMecanumDrive对象来实现。
+. 对底盘3个编码器对应的伺服电机的控制(sensor系列方法)
+. 底盘相关的所有自动Task的支持(drive方法/line系列方法/spline系列方法)
+. 底盘自动驾驶相关的坐标系可按机器人本身坐标或场地坐标灵活设置(resetPos方法)
 
-Warning:  This is not for the inexperienced Software developer.
-You will need to be comfortable with File manipulations and managing Android Studio Modules.
-These changes are performed OUTSIDE of Android Studios, so close Android Studios before you do this.
- 
-Also.. Make a full project backup before you start this :)
 
-To clone TeamCode, do the following:
+### intake
+Intake货物收发控制
 
-Note: Some names start with "Team" and others start with "team".  This is intentional.
+teamcode/subsystems/IntakeSystem.java
+参数：
+SPEED_ROUND 按圈/s描述的速度
 
-1)  Using your operating system file management tools, copy the whole "TeamCode"
-    folder to a sibling folder with a corresponding new name, eg: "Team0417".
+简单的控制intake电机方向
+. 吸入(intake方法)
+. 吐出(out方法)
+. 吸入，专用于手动控制的，支持开关控制(intakeManual)
+. 吐出，专用于手动控制的，支持开关控制(outManual)
 
-2)  In the new Team0417 folder, delete the TeamCode.iml file.
+### 运货(Head)
+货物运送控制
+teamcode/subsystems/HeadSystem.java
+命名：neck代表控制装运货物容器的电机、mouse代表控制门的伺服
 
-3)  the new Team0417 folder, rename the "src/main/java/org/firstinspires/ftc/teamcode" folder
-    to a matching name with a lowercase 'team' eg:  "team0417".
+自动程序控制主要使用RunToPosition模式
+手动程序控制混合使用RunToPosition模式和RunUsingEncoder模式
 
-4)  In the new Team0417/src/main folder, edit the "AndroidManifest.xml" file, change the line that contains
-         package="org.firstinspires.ftc.teamcode"
-    to be
-         package="org.firstinspires.ftc.team0417"
+前置条件：
+需要估算/测试几个主要点位的tick数值
 
-5)  Add:    include ':Team0417' to the "/settings.gradle" file.
-    
-6)  Open up Android Studios and clean out any old files by using the menu to "Build/Clean Project""
+TICK_PER_REV：电机输出端每圈tick（编码器数值）
+NECK_GEAR_RATIO：RobotConfig中没有60:1比例的电机设置，需要在此处记录一下实际比例和配置比例的误差；如需要使用setVelocity方法做控制需要使用本数据
+NECK_SPEED_MANUAL：手动控制需要使用setVelocity
+
+posInit：比赛时初始化状态的位置，通常等于posIntake;(neck编码器位置数据、mouse伺服位置数据)
+posIntake：接受intake货物的位置，需要和限位开关结合使用；目前限位开关程序未完成;(neck编码器位置数据、mouse伺服位置数据)
+posLevel1：hub1层高度对应的(neck编码器位置数据、mouse伺服位置数据)
+posLevel2：hub2层高度对应的(neck编码器位置数据、mouse伺服位置数据)
+posLevel3：hub3层高度对应的(neck编码器位置数据、mouse伺服位置数据)
+
+### 转盘(Carousel)
+转盘控制
+用于控制鸭子转盘的程序
+teamcode/subsystems/CarouselSystem.java
+
+前置条件：
+转鸭子的起始速度、最高速度、旋转时间三个参数
+参考teamcode/test/CarouselTest系列
+
+提供三种运行状态：
+. 匀速旋转(goByDegree方法)
+. 匀加速旋转(goStill方法，多线程模式，默认时长、自定义时长)
+. 变加速旋转(goBerzer方法，多线程模式，默认时长、自定义时长)
+
+可以考虑运用后两种方法实现手动EndingGame阶段转鸭子完全自动化
+
+
+### 机械臂(Arm)
+抓取放置标志物的机械臂，仅用于手动Capping阶段任务阶段
+teamcode/subsystems/ArmSystem.java
+
+命名：
+arm代表控制装机械臂的电机
+wrist代表安装在机械臂中部的伺服电机
+claw代表安装在顶部爪子位置的伺服电机
+
+自动程序控制主要使用RunToPosition模式
+手动程序控制混合使用RunToPosition模式和RunUsingEncoder模式
+
+前置条件：
+需要估算/测试arm几个主要点位的电机编码器tick数值
+需要测试wrist、claw的position数值
+
+TICK_PER_REV：电机输出端每圈tick（编码器数值）
+ARM_SPEED_MANUAL：手动控制需要使用setVelocity
+
+posInit：比赛时初始化状态的位置，通常等于posIntake;(arm编码器位置数据、wrist伺服位置数据、claw伺服位置数据)
+posLevelTop：Capping得分点比2层高度更高的余量位置对应的(arm编码器位置数据、wrist伺服位置数据、claw伺服位置数据)
+posLevelMid：Capping得分点2层高度对应的(arm编码器位置数据、wrist伺服位置数据、claw伺服位置数据)
+posLevelBottom：Capping得分点1层高度对应的(arm编码器位置数据、wrist伺服位置数据、claw伺服位置数据)
+posIntake：抓取标志的位置，需要和限位开关结合使用；目前限位开关程序未完成;(arm编码器位置数据、wrist伺服位置数据、claw伺服位置数据)
+
+## 手动阶段程序
+teamcode/Manual.java
+
+
+## 自动动阶段程序
+自动程序的所有方案存储在AutoPlan.java文件
+所有自动程序结构基本完全一样，仅需在init方法load不同的自动方案即可
+
+因此，当需要新建一个自动路线或者方案时，需要完成2步操作：
+1、AutoPlan中增加一个新的方案，其中确定每个设备模块的任务链
+2、复制Auto_Sample；粘贴到一个新名字的文件中；打开并在init方法中修改自动方案名称为步骤1中设计的方法名字即可。
+
+
+案例程序：
+teamcode/Auto_Sample.java
+包含主要功能演示，不具有实际运行效果。
+可以直接复制粘贴此文件来创建新的自动路线
+
+案例程序：蓝色下路
+teamcode/Auto_Blue_Storage.java
+
+案例程序：蓝色上路
+teamcode/Auto_Blue_Wearhouse.java
+
+案例程序：红色下路
+teamcode/Auto_Red_Storage.java
+
+自动路线规划：
+teamcode/AutoPlan.java
+所有的自动路线规划尽在此文件中。
+能够完成对机器人的各个子系统的控制。
+
+

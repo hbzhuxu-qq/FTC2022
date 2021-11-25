@@ -67,33 +67,30 @@ public class ArmSystem extends DeviceBase {
 
 
     public void actionInit(){
-        currPos = LEVEL_INIT;
         actionTo(LEVEL_INIT);
     }
 
     public void actionLevel1(){
-        currPos = LEVEL_BOTTOM;
         actionTo(LEVEL_BOTTOM);
     }
 
     public void actionLevel2(){
-        currPos = LEVEL_MID;
         actionTo(LEVEL_MID);
     }
 
     public void actionLevel3(){
-        currPos = LEVEL_TOP;
         actionTo(LEVEL_TOP);
     }
 
     public void actionIntake(){
-        currPos = LEVEL_INTAKE;
+
         actionTo(LEVEL_INTAKE);
     }
 
     public void actionTo(int level){
         if(level<0) level = 0;
         if(level>=allPos.size())  level = allPos.size()-1;
+        currPos = level;
         action(allPos.get(level));
     }
 
@@ -130,11 +127,13 @@ public class ArmSystem extends DeviceBase {
 
     // 手动抬头
     public void upManual(){
+        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setVelocity(ARM_SPEED_MANUAL, AngleUnit.DEGREES);
     }
 
     // 手动降低
     public void downManual(){
+        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setVelocity(ARM_SPEED_MANUAL, AngleUnit.DEGREES);
     }
 
@@ -166,7 +165,7 @@ public class ArmSystem extends DeviceBase {
 
     @Override
     public void stop() {
-
+        arm.setVelocity(0);
     }
 
 

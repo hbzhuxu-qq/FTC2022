@@ -178,7 +178,7 @@ public class MecanumDriveWrapper extends DeviceBase {
     }
 
     public void resetPos(double x, double y, double heading){
-
+        pos = new Pose2d(x,y,heading);
     }
 
     public void trajectoryWait(double secs){
