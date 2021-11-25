@@ -12,9 +12,27 @@
 ## 模块组成
 ## 底盘
 底盘控制程序
-
-集成了RoadRunner相关功能控制。
 teamcode/subsystems/MecanumDriveWrapper.java
+参数：参考RoadRunner的Tune和Test相关流程
+主要是DriveConstants,SampleMecanumDrive,StandardTrackingWheelLocalizer中的参数
+
+前置测试：
+https://www.learnroadrunner.com/
+
+Drive Constants     底盘相关参数校准
+Dead Wheels         三个编码器相关参数校准
+Feedforward Tuning  速度和电压电流关系的校准
+Straight Test Tuning    验证前几个数据调校的是否准确
+Track Width Tuning  机器人宽度校准
+Turn Test Tuning        验证前几个数据调校的是否准确
+Localization Test 2*    再次验证前两组参数
+Follower PID Tuning 路径跟随pid校准
+Spline Test             验证曲线运动是否精确
+
+
+
+功能：
+集成了RoadRunner相关功能控制。
 . 对底盘的实际控制由内部的SampleMecanumDrive对象来实现。
 . 对底盘3个编码器对应的伺服电机的控制(sensor系列方法)
 . 底盘相关的所有自动Task的支持(drive方法/line系列方法/spline系列方法)
@@ -23,11 +41,16 @@ teamcode/subsystems/MecanumDriveWrapper.java
 
 ### intake
 Intake货物收发控制
-
 teamcode/subsystems/IntakeSystem.java
+
 参数：
 SPEED_ROUND 按圈/s描述的速度
 
+前置测试：
+电机速度
+电机方向
+
+功能：
 简单的控制intake电机方向
 . 吸入(intake方法)
 . 吐出(out方法)
